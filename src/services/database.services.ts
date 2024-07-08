@@ -1,4 +1,6 @@
-import { Db, MongoClient } from 'mongodb';
+import { Collection, Db, MongoClient } from 'mongodb';
+
+import User from '@/models/schemas/User.schema';
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@nodejs.bdofct8.mongodb.net/?retryWrites=true&w=majority&appName=nodejs`;
 
@@ -19,6 +21,10 @@ class DatabaseService {
       console.log(error);
       throw error;
     }
+  }
+
+  get users(): Collection<User> {
+    return this.db.collection(process.env.DB_USERS_COLLECTION_NAME as string);
   }
 }
 
