@@ -1,12 +1,18 @@
 import express from 'express';
 
 import { loginController, registerController } from '@/controllers/users.controllers';
-import { registerValidator } from '@/middlewares/users.middlewares';
+import { loginValidator, registerValidator } from '@/middlewares/users.middlewares';
 import { wrapRequestHandler } from '@/utils/handlers';
 
 const usersRouter = express.Router();
 
-usersRouter.post('/login', loginController);
+/**
+ * Description: Login user
+ * Path: /login
+ * Method: POST
+ * Body: { email: string, password: string }
+ */
+usersRouter.post('/login', loginValidator, wrapRequestHandler(loginController));
 
 /**
  * Description: Register a new user

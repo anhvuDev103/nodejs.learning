@@ -1,5 +1,5 @@
 import { TokenType } from '@/constants/enums';
-import { RegisterRequestBody } from '@/models/requests/User.requests';
+import { LoginRequestBody, RegisterRequestBody } from '@/models/requests/User.requests';
 import User from '@/models/schemas/User.schema';
 import { hashPassword } from '@/utils/cryto';
 import { signToken } from '@/utils/jwt';
@@ -31,6 +31,19 @@ class UserService {
     });
   }
 
+  private signAccessAndRefreshToken(user_id: string) {
+    return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)]);
+  }
+
+  async login(user_id: string) {
+    const [access_token, refresh_token] = await this.signAccessAndRefreshToken(user_id);
+
+    return {
+      access_token,
+      refresh_token,
+    };
+  }
+
   async register(payload: RegisterRequestBody) {
     const result = await databaseService.users.insertOne(
       new User({
@@ -42,10 +55,7 @@ class UserService {
 
     const user_id = result.insertedId.toString();
 
-    const [access_token, refresh_token] = await Promise.all([
-      this.signAccessToken(user_id),
-      this.signRefreshToken(user_id),
-    ]);
+    const [access_token, refresh_token] = await this.signAccessAndRefreshToken(user_id);
 
     return {
       access_token,
