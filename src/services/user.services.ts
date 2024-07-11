@@ -1,5 +1,8 @@
+import { ObjectId } from 'mongodb';
+
 import { TokenType } from '@/constants/enums';
 import { LoginRequestBody, RegisterRequestBody } from '@/models/requests/User.requests';
+import RefreshToken from '@/models/schemas/RefreshToken.schema';
 import User from '@/models/schemas/User.schema';
 import { hashPassword } from '@/utils/cryto';
 import { signToken } from '@/utils/jwt';
@@ -38,6 +41,12 @@ class UserService {
   async login(user_id: string) {
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken(user_id);
 
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        user_id: ObjectId.createFromHexString(user_id),
+        token: refresh_token,
+      }),
+    );
     return {
       access_token,
       refresh_token,
@@ -53,9 +62,16 @@ class UserService {
       }),
     );
 
-    const user_id = result.insertedId.toString();
+    const user_id = result.insertedId;
 
-    const [access_token, refresh_token] = await this.signAccessAndRefreshToken(user_id);
+    const [access_token, refresh_token] = await this.signAccessAndRefreshToken(user_id.toString());
+
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        user_id,
+        token: refresh_token,
+      }),
+    );
 
     return {
       access_token,
