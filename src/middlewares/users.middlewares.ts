@@ -7,19 +7,28 @@ import { validate } from '@/utils/validation';
 export const registerValidator = validate(
   checkSchema({
     name: {
-      notEmpty: true,
-      isString: true,
+      notEmpty: {
+        errorMessage: USERS_MESSAGES.NAME_IS_REQUIRED,
+      },
+      isString: {
+        errorMessage: USERS_MESSAGES.NAME_MUST_BE_A_STRING,
+      },
       isLength: {
         options: {
           min: 1,
           max: 100,
         },
+        errorMessage: USERS_MESSAGES.NAME_LENGTH_MUST_BE_FROM_1_TO_100,
       },
       trim: true,
     },
     email: {
-      notEmpty: true,
-      isEmail: true,
+      notEmpty: {
+        errorMessage: USERS_MESSAGES.EMAIL_IS_REQUIRED,
+      },
+      isEmail: {
+        errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID,
+      },
       trim: true,
       custom: {
         options: async (value) => {
@@ -34,13 +43,18 @@ export const registerValidator = validate(
       },
     },
     password: {
-      notEmpty: true,
-      isString: true,
+      notEmpty: {
+        errorMessage: USERS_MESSAGES.PASSWORD_IS_REQUIRED,
+      },
+      isString: {
+        errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_A_STRING,
+      },
       isLength: {
         options: {
           min: 6,
           max: 50,
         },
+        errorMessage: USERS_MESSAGES.PASSWORD_LENGTH_MUST_BE_FROM_6_TO_50,
       },
       isStrongPassword: {
         options: {
@@ -54,13 +68,18 @@ export const registerValidator = validate(
       },
     },
     confirm_password: {
-      notEmpty: true,
-      isString: true,
+      notEmpty: {
+        errorMessage: USERS_MESSAGES.PASSWORD_IS_REQUIRED,
+      },
+      isString: {
+        errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_A_STRING,
+      },
       isLength: {
         options: {
           min: 6,
           max: 50,
         },
+        errorMessage: USERS_MESSAGES.PASSWORD_LENGTH_MUST_BE_FROM_6_TO_50,
       },
       isStrongPassword: {
         options: {
@@ -88,6 +107,7 @@ export const registerValidator = validate(
           strict: true,
           strictSeparator: true,
         },
+        errorMessage: USERS_MESSAGES.DATE_OF_BIRTH_MUST_BE_ISO8601,
       },
     },
   }),
