@@ -6,6 +6,7 @@ import { UserVerifyStatus } from '@/constants/enums';
 import HTTP_STATUS from '@/constants/http-status';
 import { USERS_MESSAGES } from '@/constants/messages';
 import {
+  ForgotPasswordRequestBody,
   LogoutRequestBody,
   RegisterRequestBody,
   TokenPayload,
@@ -90,6 +91,17 @@ export const resendEmailVerifyController = async (req: Request, res: Response) =
   }
 
   const result = await userService.resendVerifyEmail(user_id);
+
+  return res.json(result);
+};
+
+export const forgotPasswordController = async (
+  req: Request<ParamsDictionary, any, ForgotPasswordRequestBody>,
+  res: Response,
+) => {
+  const { _id } = req.user as User;
+
+  const result = await userService.forgotPassword(_id.toString());
 
   return res.json(result);
 };
