@@ -1,8 +1,14 @@
 import express from 'express';
 
-import { loginController, logoutController, registerController } from '@/controllers/users.controllers';
+import {
+  emailVerifyTokenController,
+  loginController,
+  logoutController,
+  registerController,
+} from '@/controllers/users.controllers';
 import {
   accessTokenValidator,
+  emailVerifyTokenValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator,
@@ -34,5 +40,13 @@ usersRouter.post('/register', registerValidator, wrapRequestHandler(registerCont
  * Headers: { Authorization: Bearer [RefreshToken] }
  */
 usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController));
+
+/**
+ * Description: Verify email user
+ * Path: /verify-email
+ * Method: POST
+ * Body: { email_verify_token: string }
+ */
+usersRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(emailVerifyTokenController));
 
 export default usersRouter;
