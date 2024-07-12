@@ -1,7 +1,12 @@
 import express from 'express';
 
-import { loginController, registerController } from '@/controllers/users.controllers';
-import { accessTokenValidator, loginValidator, registerValidator } from '@/middlewares/users.middlewares';
+import { loginController, logoutController, registerController } from '@/controllers/users.controllers';
+import {
+  accessTokenValidator,
+  loginValidator,
+  refreshTokenValidator,
+  registerValidator,
+} from '@/middlewares/users.middlewares';
 import { wrapRequestHandler } from '@/utils/handlers';
 
 const usersRouter = express.Router();
@@ -28,16 +33,6 @@ usersRouter.post('/register', registerValidator, wrapRequestHandler(registerCont
  * Method: POST
  * Headers: { Authorization: Bearer [RefreshToken] }
  */
-usersRouter.post(
-  '/logout',
-  accessTokenValidator,
-  wrapRequestHandler((req, res) => {
-    console.log('>> Check | req:', (req as any).decoded_authorization as any);
-
-    return res.json({
-      ahhiL: 'ahihi',
-    });
-  }),
-);
+usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController));
 
 export default usersRouter;
