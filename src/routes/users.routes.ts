@@ -2,6 +2,7 @@ import express from 'express';
 
 import {
   forgotPasswordController,
+  getMeController,
   loginController,
   logoutController,
   registerController,
@@ -91,5 +92,13 @@ usersRouter.post(
  * Body: { forgot_password_token: string, password: string, confirm_password: string }
  */
 usersRouter.post('/reset-password', resetPasswordValidator, wrapRequestHandler(resetPasswordController));
+
+/**
+ * Description: Get me
+ * Path: /me
+ * Method: GET
+ * Headers: { Authorization: Bearer [RefreshToken] }
+ */
+usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController));
 
 export default usersRouter;
