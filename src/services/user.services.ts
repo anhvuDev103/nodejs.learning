@@ -72,7 +72,7 @@ class UserService {
 
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({
-        user_id: ObjectId.createFromHexString(user_id),
+        user_id: new ObjectId(user_id),
         token: refresh_token,
       }),
     );
@@ -135,7 +135,7 @@ class UserService {
       this.signAccessAndRefreshToken(user_id),
       databaseService.users.updateOne(
         {
-          _id: ObjectId.createFromHexString(user_id),
+          _id: new ObjectId(user_id),
         },
         {
           $set: {
@@ -163,7 +163,7 @@ class UserService {
 
     await databaseService.users.updateOne(
       {
-        _id: ObjectId.createFromHexString(user_id),
+        _id: new ObjectId(user_id),
       },
       {
         $set: {
@@ -185,7 +185,7 @@ class UserService {
 
     await databaseService.users.updateOne(
       {
-        _id: ObjectId.createFromHexString(user_id),
+        _id: new ObjectId(user_id),
       },
       {
         $set: {
@@ -202,6 +202,27 @@ class UserService {
 
     return {
       message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD,
+    };
+  }
+
+  async resetPassword(user_id: string, password: string) {
+    await databaseService.users.updateOne(
+      {
+        _id: new ObjectId(user_id),
+      },
+      {
+        $set: {
+          forgot_password_token: '',
+          password: hashPassword(password),
+        },
+        $currentDate: {
+          updated_at: true,
+        },
+      },
+    );
+
+    return {
+      message: USERS_MESSAGES.RESET_PASSWORD_SUCCESS,
     };
   }
 }

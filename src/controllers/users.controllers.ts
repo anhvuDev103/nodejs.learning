@@ -9,6 +9,7 @@ import {
   ForgotPasswordRequestBody,
   LogoutRequestBody,
   RegisterRequestBody,
+  ResetPasswordRequestBody,
   TokenPayload,
   VerifyEmailRequestBody,
   VerifyForgotPasswordRequestBody,
@@ -49,7 +50,7 @@ export const verifyEmailController = async (
   res: Response,
 ) => {
   const { user_id } = req.decoded_email_verify_token as TokenPayload;
-  const user = await databaseService.users.findOne({ _id: ObjectId.createFromHexString(user_id) });
+  const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) });
 
   if (!user) {
     return res.status(HTTP_STATUS.NOT_FOUND).json({
@@ -76,7 +77,7 @@ export const resendEmailVerifyController = async (req: Request, res: Response) =
   const { user_id } = req.decoded_authorization as TokenPayload;
 
   const user = await databaseService.users.findOne({
-    _id: ObjectId.createFromHexString(user_id),
+    _id: new ObjectId(user_id),
   });
 
   if (!user) {
@@ -114,4 +115,16 @@ export const verifyForgotPasswordController = async (
   return res.json({
     message: USERS_MESSAGES.VERIFY_FORGOT_PASSWORD_SUCCESS,
   });
+};
+
+export const resetPasswordController = async (
+  req: Request<ParamsDictionary, any, ResetPasswordRequestBody>,
+  res: Response,
+) => {
+  const { user_id } = req.decoded_forgot_password_token as TokenPayload;
+  const { password } = req.body;
+
+  const result = await userService.resetPassword(user_id, password);
+
+  return res.json(result);
 };
