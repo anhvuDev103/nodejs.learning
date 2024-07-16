@@ -12,6 +12,7 @@ import {
   verifyEmailController,
   verifyForgotPasswordController,
 } from '@/controllers/users.controllers';
+import { filterMiddleware } from '@/middlewares/common.middlewares';
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
@@ -24,6 +25,7 @@ import {
   verifiedUserValidator,
   verifyForgotPasswordTokenValidator,
 } from '@/middlewares/users.middlewares';
+import { UpdateMeRequestBody } from '@/models/requests/User.requests';
 import { wrapRequestHandler } from '@/utils/handlers';
 
 const usersRouter = express.Router();
@@ -116,6 +118,16 @@ usersRouter.patch(
   accessTokenValidator,
   verifiedUserValidator,
   updateMeValidator,
+  filterMiddleware<UpdateMeRequestBody>([
+    'avatar',
+    'bio',
+    'cover_photo',
+    'date_of_birth',
+    'location',
+    'name',
+    'username',
+    'website',
+  ]),
   wrapRequestHandler(updateMeController),
 );
 
