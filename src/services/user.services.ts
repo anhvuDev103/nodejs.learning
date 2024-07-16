@@ -1,8 +1,10 @@
 import { ObjectId } from 'mongodb';
 
 import { TokenType, UserVerifyStatus } from '@/constants/enums';
+import HTTP_STATUS from '@/constants/http-status';
 import { USERS_MESSAGES } from '@/constants/messages';
-import { LoginRequestBody, RegisterRequestBody, UpdateMeRequestBody } from '@/models/requests/User.requests';
+import { ErrorWithStatus } from '@/models/Errors';
+import { RegisterRequestBody, UpdateMeRequestBody } from '@/models/requests/User.requests';
 import RefreshToken from '@/models/schemas/RefreshToken.schema';
 import User from '@/models/schemas/User.schema';
 import { hashPassword } from '@/utils/cryto';
@@ -98,6 +100,7 @@ class UserService {
       new User({
         ...payload,
         _id: user_id,
+        username: `user${user_id.toString()}`,
         password: hashPassword(payload.password),
         date_of_birth: new Date(payload.date_of_birth),
         email_verify_token,
@@ -285,6 +288,33 @@ class UserService {
         },
       },
     );
+
+    return user;
+  }
+
+  async getProfile(username: string) {
+    const user = await databaseService.users.findOne(
+      {
+        username,
+      },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          verify: 0,
+          created_at: 0,
+          updated_at: 0,
+        },
+      },
+    );
+
+    if (user === null) {
+      throw new ErrorWithStatus({
+        message: USERS_MESSAGES.USER_NOT_FOUND,
+        status: HTTP_STATUS.NOT_FOUND,
+      });
+    }
 
     return user;
   }

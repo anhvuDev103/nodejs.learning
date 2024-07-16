@@ -12,6 +12,7 @@ import {
   ResetPasswordRequestBody,
   TokenPayload,
   UpdateMeRequestBody,
+  UpdateMeRequestParams,
   VerifyEmailRequestBody,
   VerifyForgotPasswordRequestBody,
 } from '@/models/requests/User.requests';
@@ -152,6 +153,17 @@ export const updateMeController = async (req: Request<ParamsDictionary, any, Upd
 
   return res.json({
     message: USERS_MESSAGES.UPDATE_ME_SUCCESS,
+    result,
+  });
+};
+
+export const getProfileController = async (req: Request<UpdateMeRequestParams>, res: Response) => {
+  const { username } = req.params;
+
+  const result = await userService.getProfile(username);
+
+  return res.json({
+    message: USERS_MESSAGES.GET_PROFILE_SUCCESS,
     result,
   });
 };
