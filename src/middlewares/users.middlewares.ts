@@ -496,7 +496,7 @@ export const updateMeValidator = validate(
         custom: {
           options: async (value: string) => {
             if (!USERNAME_REGEX.test(value)) {
-              throw Error(USERS_MESSAGES.USERNAME_INVALID);
+              throw new Error(USERS_MESSAGES.USERNAME_INVALID);
             }
 
             const user = await databaseService.users.findOne({
@@ -504,7 +504,7 @@ export const updateMeValidator = validate(
             });
 
             if (user) {
-              throw Error(USERS_MESSAGES.USERNAME_EXISTED);
+              throw new Error(USERS_MESSAGES.USERNAME_EXISTED);
             }
 
             return true;
@@ -534,5 +534,45 @@ export const unfollowValidator = validate(
       user_id: userIdSchema,
     },
     ['params'],
+  ),
+);
+
+export const changePasswordValidator = validate(
+  checkSchema(
+    {
+      old_password: {
+        ...passwordSchema,
+        custom: {
+          options: async (value: string, { req }) => {
+            const { user_id } = (req as Request).decoded_authorization as TokenPayload;
+
+            const user = await databaseService.users.findOne({
+              _id: new ObjectId(user_id),
+            });
+
+            if (user === null) {
+              throw new ErrorWithStatus({
+                message: USERS_MESSAGES.USER_NOT_FOUND,
+                status: HTTP_STATUS.NOT_FOUND,
+              });
+            }
+
+            if (user.password !== hashPassword(value)) {
+              throw new ErrorWithStatus({
+                message: USERS_MESSAGES.OLD_PASSWORD_NOT_MATCH,
+                status: HTTP_STATUS.UNAUTHORIZED,
+              });
+            }
+
+            (req as Request).user = user;
+            console.log('>> Check | user:', user);
+            return true;
+          },
+        },
+      },
+      password: passwordSchema,
+      confirm_password: confirmPasswordSchema,
+    },
+    ['body'],
   ),
 );
