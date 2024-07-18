@@ -164,6 +164,12 @@ class UserService {
     ]);
 
     const [access_token, refresh_token] = tokens;
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        token: refresh_token,
+        user_id: new ObjectId(user_id),
+      }),
+    );
 
     return {
       access_token,
