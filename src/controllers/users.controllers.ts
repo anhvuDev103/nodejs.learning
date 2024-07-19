@@ -9,6 +9,7 @@ import {
   ChangePasswordRequestBody,
   FollowRequestBody,
   ForgotPasswordRequestBody,
+  LoginRequestBody,
   LogoutRequestBody,
   RegisterRequestBody,
   ResetPasswordRequestBody,
@@ -23,7 +24,7 @@ import User from '@/models/schemas/User.schema';
 import databaseService from '@/services/database.services';
 import userService from '@/services/user.services';
 
-export const loginController = async (req: Request, res: Response) => {
+export const loginController = async (req: Request<ParamsDictionary, any, LoginRequestBody>, res: Response) => {
   const user = req.user as User;
   const user_id = user._id;
   const result = await userService.login({
@@ -35,6 +36,16 @@ export const loginController = async (req: Request, res: Response) => {
     message: USERS_MESSAGES.LOGIN_SUCCESS,
     result,
   });
+};
+
+export const oauthController = async (req: Request, res: Response) => {
+  const { code } = req.query;
+
+  const result = await userService.oauth(code as string);
+
+  const urlRedirect = `${process.env.CLIENT_REDIRECT_CALLBACK}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&new_user=${result.newUser}&verify=${result.verify}`;
+
+  return res.redirect(urlRedirect);
 };
 
 export const registerController = async (req: Request<ParamsDictionary, any, RegisterRequestBody>, res: Response) => {

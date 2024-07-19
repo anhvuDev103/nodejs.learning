@@ -8,6 +8,7 @@ import {
   getProfileController,
   loginController,
   logoutController,
+  oauthController,
   registerController,
   resendEmailVerifyController,
   resetPasswordController,
@@ -44,6 +45,14 @@ const usersRouter = express.Router();
  * Body: { email: string, password: string }
  */
 usersRouter.post('/login', loginValidator, wrapRequestHandler(loginController));
+
+/**
+ * Description: Login with Google
+ * Path: /oauth/google
+ * Method: GET
+ * Query: { code: string, scope: string, authuser: string, prompt: string }
+ */
+usersRouter.get('/oauth/google', wrapRequestHandler(oauthController));
 
 /**
  * Description: Register a new user
