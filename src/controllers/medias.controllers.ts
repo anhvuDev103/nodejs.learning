@@ -6,8 +6,8 @@ import { USERS_MESSAGES } from '@/constants/messages';
 import { ServeImageParams } from '@/models/requests/Static.requests';
 import mediaService from '@/services/media.services';
 
-export const uploadSingleImageController = async (req: Request, res: Response) => {
-  const url = await mediaService.handleUploadSingleImage(req);
+export const uploadImageController = async (req: Request, res: Response) => {
+  const url = await mediaService.uploadImage(req);
 
   return res.json({
     message: USERS_MESSAGES.UPLOAD_SUCCESS,

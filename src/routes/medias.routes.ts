@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { uploadSingleImageController } from '@/controllers/medias.controllers';
+import { uploadImageController } from '@/controllers/medias.controllers';
 import { wrapRequestHandler } from '@/utils/handlers';
 
 const mediasRouter = express.Router();
@@ -10,6 +10,6 @@ const mediasRouter = express.Router();
  * Path: /upload-image
  * Method: POST
  */
-mediasRouter.post('/upload-image', wrapRequestHandler(uploadSingleImageController));
+mediasRouter.post('/upload-image', wrapRequestHandler(uploadImageController));
 
 export default mediasRouter;
