@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 
+import { isProduction } from '@/constants/config';
 import { UPLOAD_DIR } from '@/constants/dir';
 import { getNameFormFullName, handleUploadSingleImage } from '@/utils/file';
 
@@ -15,7 +16,9 @@ class MediaService {
 
     fs.unlinkSync(file.filepath);
 
-    return `http://localhost:4000/uploads/${newName}.jpg`;
+    return isProduction
+      ? `${process.env.HOST}/medias/${newName}.jpg`
+      : `http://localhost:${process.env.PORT}/medias/${newName}.jpg`;
   }
 }
 
