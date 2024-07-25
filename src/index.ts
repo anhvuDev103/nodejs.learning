@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 import express from 'express';
 
-import { UPLOAD_DIR } from './constants/dir';
+import { UPLOAD_IMAGE_DIR } from './constants/dir';
 import { defaultErrorHandler } from './middlewares/error.middlewares';
 import mediasRouter from './routes/medias.routes';
 import staticRouter from './routes/static.routes';
@@ -24,7 +24,7 @@ app.use('/users', usersRouter);
 app.use('/medias', mediasRouter);
 app.use('/static', staticRouter);
 
-// app.use('/static', express.static(UPLOAD_DIR));
+// app.use('/static', express.static(UPLOAD_IMAGE_DIR));
 
 app.use(defaultErrorHandler);
 
