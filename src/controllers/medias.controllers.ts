@@ -35,9 +35,9 @@ export const serveVideoStreamController = async (req: Request<ServeImageParams>,
   const videoSize = fs.statSync(videoPath).size; //bytes
   const chunkSize = 10 ** 6; //1MB
   const start = Number(range.replace(/\D/g, ''));
-  const end = Math.min(start + chunkSize, videoSize);
+  const end = Math.min(start + chunkSize, videoSize - 1);
 
-  const contentLength = end - start;
+  const contentLength = end - start + 1;
   const contentType = mime.getType(videoPath) || 'video/*';
   const headers = {
     'Content-Range': `bytes ${start}-${end}/${videoSize}`,
