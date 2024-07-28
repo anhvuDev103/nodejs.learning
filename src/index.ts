@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 import express from 'express';
 
-import { UPLOAD_IMAGE_DIR } from './constants/dir';
+import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from './constants/dir';
 import { defaultErrorHandler } from './middlewares/error.middlewares';
 import mediasRouter from './routes/medias.routes';
 import staticRouter from './routes/static.routes';
@@ -23,8 +23,7 @@ app.use(express.json());
 app.use('/users', usersRouter);
 app.use('/medias', mediasRouter);
 app.use('/static', staticRouter);
-
-// app.use('/static', express.static(UPLOAD_IMAGE_DIR));
+app.use('/static/video', express.static(UPLOAD_VIDEO_DIR));
 
 app.use(defaultErrorHandler);
 
