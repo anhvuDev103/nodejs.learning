@@ -20,6 +20,10 @@ export interface LogoutRequestBody {
   refresh_token: string;
 }
 
+export interface RefreshTokenRequestBody {
+  refresh_token: string;
+}
+
 export interface VerifyEmailRequestBody {
   email_verify_token: string;
 }

@@ -14,7 +14,7 @@ staticRouter.get('/image/:name', serveImageController);
 
 /**
  * Description: View a video
- * Path: /video/:name
+ * Path: /video-stream/:name
  * Method: GET
  */
 staticRouter.get('/video-stream/:name', serveVideoStreamController);

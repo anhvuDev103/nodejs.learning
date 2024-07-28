@@ -11,6 +11,7 @@ import {
   ForgotPasswordRequestBody,
   LoginRequestBody,
   LogoutRequestBody,
+  RefreshTokenRequestBody,
   RegisterRequestBody,
   ResetPasswordRequestBody,
   TokenPayload,
@@ -62,6 +63,21 @@ export const logoutController = async (req: Request<ParamsDictionary, any, Logou
   const result = await userService.logout(refresh_token);
 
   return res.json(result);
+};
+
+export const refreshTokenController = async (
+  req: Request<ParamsDictionary, any, RefreshTokenRequestBody>,
+  res: Response,
+) => {
+  const { refresh_token } = req.body;
+  const { user_id, verify } = req.decoded_refresh_token as TokenPayload;
+  const result = await userService.refreshToken({
+    user_id,
+    verify,
+    token: refresh_token,
+  });
+
+  return res.json({ message: USERS_MESSAGES.REFRESH_TOKEN_SUCCESS, result });
 };
 
 export const verifyEmailController = async (
