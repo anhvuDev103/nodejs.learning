@@ -1,6 +1,10 @@
 import express from 'express';
 
-import { uploadImageController, uploadVideoController } from '@/controllers/medias.controllers';
+import {
+  uploadImageController,
+  uploadVideoController,
+  uploadVideoHlsController,
+} from '@/controllers/medias.controllers';
 import { accessTokenValidator, verifiedUserValidator } from '@/middlewares/users.middlewares';
 import { wrapRequestHandler } from '@/utils/handlers';
 
@@ -28,6 +32,18 @@ mediasRouter.post(
   accessTokenValidator,
   verifiedUserValidator,
   wrapRequestHandler(uploadVideoController),
+);
+
+/**
+ * Description: Upload video
+ * Path: /upload-video
+ * Method: POST
+ */
+mediasRouter.post(
+  '/upload-video-hls',
+  accessTokenValidator,
+  verifiedUserValidator,
+  wrapRequestHandler(uploadVideoHlsController),
 );
 
 export default mediasRouter;

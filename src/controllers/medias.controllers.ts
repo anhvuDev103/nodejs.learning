@@ -68,3 +68,12 @@ export const uploadVideoController = async (req: Request, res: Response) => {
     result: url,
   });
 };
+
+export const uploadVideoHlsController = async (req: Request, res: Response) => {
+  const url = await mediaService.uploadVideoHls(req);
+
+  return res.json({
+    message: USERS_MESSAGES.UPLOAD_SUCCESS,
+    result: url,
+  });
+};

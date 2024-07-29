@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import formidable, { File } from 'formidable';
 import fs from 'fs';
+import path from 'path';
 
 import { UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_DIR, UPLOAD_VIDEO_TEMP_DIR } from '@/constants/dir';
 
@@ -47,9 +48,14 @@ export const handleUploadImage = (req: Request) => {
   });
 };
 
-export const handleUploadVideo = (req: Request) => {
+export const handleUploadVideo = async (req: Request) => {
+  const nanoId = (await import('nanoid')).nanoid;
+  const idName = nanoId();
+
+  const folderPath = path.resolve(UPLOAD_VIDEO_DIR, idName);
+  fs.mkdirSync(folderPath);
   const form = formidable({
-    uploadDir: UPLOAD_VIDEO_DIR,
+    uploadDir: folderPath,
     maxFiles: 1,
     maxFileSize: 50 * 1024 * 1024, // 50MB
     filter: function ({ name, mimetype }) {
@@ -60,6 +66,9 @@ export const handleUploadVideo = (req: Request) => {
       }
 
       return valid;
+    },
+    filename: function () {
+      return idName;
     },
   });
 
@@ -78,6 +87,7 @@ export const handleUploadVideo = (req: Request) => {
         const ext = getExtension(video.originalFilename as string);
         fs.renameSync(video.filepath, `${video.filepath}.${ext}`);
         video.newFilename = `${video.newFilename}.${ext}`;
+        video.filepath = `${video.filepath}.${ext}`;
       });
 
       resolve(files.video);
@@ -85,7 +95,7 @@ export const handleUploadVideo = (req: Request) => {
   });
 };
 
-export const getNameFormFullName = (fullname: string) => {
+export const getNameFromFullName = (fullname: string) => {
   const namearr = fullname.split('.');
   namearr.pop();
   return namearr.join('');

@@ -565,7 +565,6 @@ export const changePasswordValidator = validate(
             }
 
             (req as Request).user = user;
-            console.log('>> Check | user:', user);
             return true;
           },
         },
