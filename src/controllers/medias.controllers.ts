@@ -5,7 +5,7 @@ import path from 'path';
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '@/constants/dir';
 import HTTP_STATUS from '@/constants/http-status';
 import { USERS_MESSAGES } from '@/constants/messages';
-import { ServeImageParams } from '@/models/requests/Static.requests';
+import { ServeImageParams, ServeM3u8Params, ServeSegmentParams } from '@/models/requests/Static.requests';
 import mediaService from '@/services/media.services';
 
 export const serveImageController = (req: Request<ServeImageParams>, res: Response) => {
@@ -49,6 +49,27 @@ export const serveVideoStreamController = async (req: Request<ServeImageParams>,
   res.writeHead(HTTP_STATUS.PARTIAL_CONTENT, headers);
   const videoStream = fs.createReadStream(videoPath, { start, end });
   videoStream.pipe(res);
+};
+
+export const serveM3u8Controller = (req: Request<ServeM3u8Params>, res: Response) => {
+  const { id } = req.params;
+  const [realId] = id.split('.');
+
+  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, realId, 'master.m3u8'), (err) => {
+    if (err) {
+      res.status((err as any).status).send('Not found');
+    }
+  });
+};
+
+export const serveSegmentController = (req: Request<ServeSegmentParams>, res: Response) => {
+  const { id, v, segment } = req.params;
+
+  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, v, segment), (err) => {
+    if (err) {
+      res.status((err as any).status).send('Not found');
+    }
+  });
 };
 
 export const uploadImageController = async (req: Request, res: Response) => {

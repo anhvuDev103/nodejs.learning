@@ -61,8 +61,8 @@ class MediaService {
 
         return {
           url: isProduction
-            ? `${process.env.HOST}/static/video-hls/${name}`
-            : `http://localhost:${process.env.PORT}/static/video-hls/${name}`,
+            ? `${process.env.HOST}/static/video-hls/${name}.m3u8`
+            : `http://localhost:${process.env.PORT}/static/video-hls/${name}.m3u8`,
           type: MediaType.Hls,
         };
       }),
