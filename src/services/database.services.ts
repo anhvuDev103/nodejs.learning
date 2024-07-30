@@ -3,6 +3,7 @@ import { Collection, Db, MongoClient } from 'mongodb';
 import Follower from '@/models/schemas/Follower.schema';
 import RefreshToken from '@/models/schemas/RefreshToken.schema';
 import User from '@/models/schemas/User.schema';
+import VideoStatus from '@/models/schemas/VideoStatus.schema';
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@nodejs.bdofct8.mongodb.net/?retryWrites=true&w=majority&appName=nodejs`;
 
@@ -35,6 +36,10 @@ class DatabaseService {
 
   get followers(): Collection<Follower> {
     return this.db.collection(process.env.DB_FOLLOWERS_COLLECTION_NAME as string);
+  }
+
+  get videoStatus(): Collection<VideoStatus> {
+    return this.db.collection(process.env.DB_VIDEO_STATUS_COLLECTION_NAME as string);
   }
 }
 

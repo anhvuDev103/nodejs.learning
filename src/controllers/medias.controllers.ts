@@ -5,7 +5,12 @@ import path from 'path';
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '@/constants/dir';
 import HTTP_STATUS from '@/constants/http-status';
 import { USERS_MESSAGES } from '@/constants/messages';
-import { ServeImageParams, ServeM3u8Params, ServeSegmentParams } from '@/models/requests/Static.requests';
+import {
+  ServeImageParams,
+  ServeM3u8Params,
+  ServeSegmentParams,
+  VideoStatusParams,
+} from '@/models/requests/Static.requests';
 import mediaService from '@/services/media.services';
 
 export const serveImageController = (req: Request<ServeImageParams>, res: Response) => {
@@ -96,5 +101,15 @@ export const uploadVideoHlsController = async (req: Request, res: Response) => {
   return res.json({
     message: USERS_MESSAGES.UPLOAD_SUCCESS,
     result: url,
+  });
+};
+
+export const videoStatusController = async (req: Request<VideoStatusParams>, res: Response) => {
+  const { id } = req.params;
+  const result = await mediaService.getVideoStatus(id);
+
+  return res.json({
+    message: USERS_MESSAGES.GET_VIDEO_STATUS_SUCCESS,
+    result,
   });
 };

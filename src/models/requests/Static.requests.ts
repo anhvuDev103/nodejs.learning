@@ -13,3 +13,7 @@ export interface ServeSegmentParams extends ParamsDictionary {
   v: string;
   segment: string;
 }
+
+export interface VideoStatusParams extends ParamsDictionary {
+  id: string;
+}
