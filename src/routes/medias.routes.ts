@@ -4,6 +4,7 @@ import {
   uploadImageController,
   uploadVideoController,
   uploadVideoHlsController,
+  videoStatusController,
 } from '@/controllers/medias.controllers';
 import { accessTokenValidator, verifiedUserValidator } from '@/middlewares/users.middlewares';
 import { wrapRequestHandler } from '@/utils/handlers';
@@ -44,6 +45,18 @@ mediasRouter.post(
   accessTokenValidator,
   verifiedUserValidator,
   wrapRequestHandler(uploadVideoHlsController),
+);
+
+/**
+ * Description: Get video status
+ * Path: /video-status
+ * Method: GET
+ */
+mediasRouter.get(
+  '/video-status/:id',
+  accessTokenValidator,
+  verifiedUserValidator,
+  wrapRequestHandler(videoStatusController),
 );
 
 export default mediasRouter;
