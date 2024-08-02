@@ -11,7 +11,12 @@ import usersRouter from './routes/users.routes';
 import databaseService from './services/database.services';
 import { initFolder } from './utils/file';
 
-databaseService.connect().then(() => databaseService.indexUsers());
+databaseService.connect().then(() => {
+  databaseService.indexUsers();
+  databaseService.indexRefreshTokens();
+  databaseService.indexVideoStatus();
+  databaseService.indexFollowers();
+});
 
 const app = express();
 const port = process.env.PORT;
