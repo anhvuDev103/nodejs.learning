@@ -67,7 +67,7 @@ usersRouter.post('/register', registerValidator, wrapRequestHandler(registerCont
  * Description: Logout a new user
  * Path: /logout
  * Method: POST
- * Headers: { Authorization: Bearer [RefreshToken] }
+ * Headers: { Authorization: Bearer [AccessToken] }
  */
 usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController));
 
@@ -91,7 +91,7 @@ usersRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(
  * Description: Resend verify email
  * Path: /resend-verify-email
  * Method: POST
- * Headers: { Authorization: Bearer [RefreshToken] }
+ * Headers: { Authorization: Bearer [AccessToken] }
  */
 usersRouter.post('/resend-verify-email', accessTokenValidator, wrapRequestHandler(resendEmailVerifyController));
 
@@ -127,7 +127,7 @@ usersRouter.post('/reset-password', resetPasswordValidator, wrapRequestHandler(r
  * Description: Get me
  * Path: /me
  * Method: GET
- * Headers: { Authorization: Bearer [RefreshToken] }
+ * Headers: { Authorization: Bearer [AccessToken] }
  */
 usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController));
 
@@ -135,7 +135,7 @@ usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController)
  * Description: Update my profile
  * Path: /me
  * Method: PATCH
- * Headers: { Authorization: Bearer [RefreshToken] }
+ * Headers: { Authorization: Bearer [AccessToken] }
  * Body: UserSchema
  */
 usersRouter.patch(
@@ -167,7 +167,7 @@ usersRouter.get('/:username', wrapRequestHandler(getProfileController));
  * Description: Follow a user
  * Path: /follow
  * Method: POST
- * Headers: { Authorization: Bearer [RefreshToken] }
+ * Headers: { Authorization: Bearer [AccessToken] }
  * Body: { followed_user_id: string }
  */
 usersRouter.post(
@@ -182,7 +182,7 @@ usersRouter.post(
  * Description: Unfollow a user
  * Path: /follow/:user_id
  * Method: DELETE
- * Headers: { Authorization: Bearer [RefreshToken] }
+ * Headers: { Authorization: Bearer [AccessToken] }
  */
 usersRouter.delete(
   '/follow/:user_id',
@@ -196,7 +196,7 @@ usersRouter.delete(
  * Description: Change password
  * Path: /change-password
  * Method: PUT
- * Headers: { Authorization: Bearer [RefreshToken] }
+ * Headers: { Authorization: Bearer [AccessToken] }
  * Body: { old_password: string, password: string, comfirm_password: string }
  */
 usersRouter.put(
