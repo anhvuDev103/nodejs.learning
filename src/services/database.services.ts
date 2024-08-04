@@ -1,5 +1,6 @@
 import { Collection, Db, MongoClient } from 'mongodb';
 
+import Bookmark from '@/models/schemas/Bookmark.schema';
 import Follower from '@/models/schemas/Follower.schema';
 import Hashtag from '@/models/schemas/Hashtag.schema';
 import RefreshToken from '@/models/schemas/RefreshToken.schema';
@@ -50,6 +51,10 @@ class DatabaseService {
 
   get hashtags(): Collection<Hashtag> {
     return this.db.collection(process.env.DB_HASHTAGS_COLLECTION_NAME as string);
+  }
+
+  get bookmarks(): Collection<Bookmark> {
+    return this.db.collection(process.env.DB_BOOKMARKS_COLLECTION_NAME as string);
   }
 
   async indexUsers() {
