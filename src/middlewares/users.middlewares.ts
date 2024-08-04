@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { check, checkSchema, ParamSchema } from 'express-validator';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import { capitalize } from 'lodash';
@@ -575,3 +575,13 @@ export const changePasswordValidator = validate(
     ['body'],
   ),
 );
+
+export const isUserLoggedInValidator = (middleware: RequestHandler) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (req.headers.authorization) {
+      return middleware(req, res, next);
+    }
+
+    next();
+  };
+};
