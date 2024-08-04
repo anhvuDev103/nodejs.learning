@@ -10,12 +10,12 @@ interface TweetConstructor {
   type: TweetType;
   audience: TweetAudience;
   content: string;
-  parent_id: null | ObjectId;
+  parent_id: null | string;
   hashtags: ObjectId[];
-  mentions: ObjectId[];
+  mentions: string[];
   medias: Media[];
-  guest_views: number;
-  user_views: number;
+  guest_views?: number;
+  user_views?: number;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -43,12 +43,12 @@ class Tweet {
     this.type = tweet.type;
     this.audience = tweet.audience;
     this.content = tweet.content;
-    this.parent_id = tweet.parent_id;
+    this.parent_id = tweet.parent_id ? new ObjectId(tweet.parent_id) : null;
     this.hashtags = tweet.hashtags;
-    this.mentions = tweet.mentions;
+    this.mentions = tweet.mentions.map((mention) => new ObjectId(mention));
     this.medias = tweet.medias;
-    this.guest_views = tweet.guest_views;
-    this.user_views = tweet.user_views;
+    this.guest_views = tweet.guest_views || 0;
+    this.user_views = tweet.user_views || 0;
     this.created_at = tweet.created_at || now;
     this.updated_at = tweet.updated_at || now;
   }
