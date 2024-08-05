@@ -6,6 +6,7 @@ import express from 'express';
 import { UPLOAD_VIDEO_DIR } from './constants/dir';
 import { defaultErrorHandler } from './middlewares/error.middlewares';
 import bookmarksRouter from './routes/bookmarks.routes';
+import likesRouter from './routes/likes.routes';
 import mediasRouter from './routes/medias.routes';
 import staticRouter from './routes/static.routes';
 import tweetsRouter from './routes/tweets.routes';
@@ -34,6 +35,7 @@ app.use('/medias', mediasRouter);
 app.use('/static', staticRouter);
 app.use('/tweets', tweetsRouter);
 app.use('/bookmarks', bookmarksRouter);
+app.use('/likes', likesRouter);
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR));
 
 app.use(defaultErrorHandler);
