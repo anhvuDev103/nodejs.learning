@@ -301,3 +301,43 @@ export const audienceValidator = async (req: Request, res: Response, next: NextF
 
   next();
 };
+
+export const getTweetChildrenValidator = validate(
+  checkSchema(
+    {
+      tweet_type: {
+        isIn: {
+          options: [tweetType],
+          errorMessage: TWEETS_MESSAGES.INVALID_TYPE,
+        },
+      },
+      limit: {
+        isNumeric: true,
+        custom: {
+          options: async (value, { req }) => {
+            const number = Number(value);
+            if (number > 100 || number < 1) {
+              throw new Error('Limit must be between 1 and 100');
+            }
+
+            return true;
+          },
+        },
+      },
+      page: {
+        isNumeric: true,
+        custom: {
+          options: async (value, { req }) => {
+            const number = Number(value);
+            if (number < 1) {
+              throw new Error('Page must be bigger than 1');
+            }
+
+            return true;
+          },
+        },
+      },
+    },
+    ['query'],
+  ),
+);
