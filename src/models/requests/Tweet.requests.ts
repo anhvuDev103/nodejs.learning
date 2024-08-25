@@ -1,4 +1,5 @@
 import { ParamsDictionary } from 'express-serve-static-core';
+import { ParsedQs } from 'qs';
 
 import { TweetAudience, TweetType } from '@/constants/enums';
 
@@ -16,4 +17,15 @@ export interface TweetRequestBody {
 
 export interface GetTweetRequestParams extends ParamsDictionary {
   tweet_id: string;
+}
+
+export interface GetTweetChildrenRequestParams extends ParamsDictionary {
+  tweet_id: string;
+}
+
+export interface GetTweetChildrenRequestQueries extends ParsedQs {
+  tweet_type: string;
+  limit: string;
+  page: string;
+  query: string;
 }

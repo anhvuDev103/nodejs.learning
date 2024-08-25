@@ -1,7 +1,12 @@
 import { Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 
-import { GetTweetRequestParams, TweetRequestBody } from '@/models/requests/Tweet.requests';
+import {
+  GetTweetChildrenRequestParams,
+  GetTweetChildrenRequestQueries,
+  GetTweetRequestParams,
+  TweetRequestBody,
+} from '@/models/requests/Tweet.requests';
 import { TokenPayload } from '@/models/requests/User.requests';
 import tweetService from '@/services/tweet.services';
 
@@ -22,4 +27,34 @@ export const getTweetController = async (req: Request<GetTweetRequestParams>, re
     ...result,
   };
   return res.json({ message: 'Get tweet succesfully', result: tweet });
+};
+
+export const getTweetChildrenController = async (
+  req: Request<GetTweetChildrenRequestParams, any, any, GetTweetChildrenRequestQueries>,
+  res: Response,
+) => {
+  const { tweet_id } = req.params;
+  const { tweet_type, limit, page } = req.query;
+
+  const _tweet_type = Number(tweet_type);
+  const _limit = Number(limit);
+  const _page = Number(page);
+
+  const { tweets, total } = await tweetService.getTweetChildren({
+    tweet_id,
+    tweet_type: _tweet_type,
+    limit: _limit,
+    page: _page,
+  });
+
+  return res.json({
+    message: 'Get tweet comments succesfully',
+    result: {
+      tweets,
+      tweet_type: _tweet_type,
+      limit: _limit,
+      page: _page,
+      total_page: Math.ceil(total / _limit),
+    },
+  });
 };
