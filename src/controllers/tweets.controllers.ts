@@ -5,6 +5,7 @@ import {
   GetTweetChildrenRequestParams,
   GetTweetChildrenRequestQueries,
   GetTweetRequestParams,
+  PaginationRequestQueries,
   TweetRequestBody,
 } from '@/models/requests/Tweet.requests';
 import { TokenPayload } from '@/models/requests/User.requests';
@@ -58,5 +59,27 @@ export const getTweetChildrenController = async (
       page: _page,
       total_page: Math.ceil(total / _limit),
     },
+  });
+};
+
+export const getNewFeedsController = async (
+  req: Request<ParamsDictionary, any, any, PaginationRequestQueries>,
+  res: Response,
+) => {
+  const { limit, page } = req.query;
+  const { user_id } = req.decoded_authorization as TokenPayload;
+
+  const _limit = Number(limit);
+  const _page = Number(page);
+
+  const result = await tweetService.getNewFeeds({
+    user_id,
+    limit: _limit,
+    page: _page,
+  });
+
+  return res.json({
+    message: 'Get new feeds succesfully',
+    result,
   });
 };

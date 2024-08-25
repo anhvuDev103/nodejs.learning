@@ -23,9 +23,11 @@ export interface GetTweetChildrenRequestParams extends ParamsDictionary {
   tweet_id: string;
 }
 
-export interface GetTweetChildrenRequestQueries extends ParsedQs {
-  tweet_type: string;
+export interface PaginationRequestQueries extends ParsedQs {
   limit: string;
   page: string;
-  query: string;
+}
+
+export interface GetTweetChildrenRequestQueries extends PaginationRequestQueries {
+  tweet_type: string;
 }
