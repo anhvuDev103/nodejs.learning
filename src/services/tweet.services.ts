@@ -260,7 +260,7 @@ class TweetService {
     const ids = followed_user_ids.map((item) => item.followed_user_id);
     ids.push(user_id_obj);
 
-    const tweets = databaseService.tweets
+    const tweets = await databaseService.tweets
       .aggregate([
         {
           $match: {
