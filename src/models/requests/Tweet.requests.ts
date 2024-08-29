@@ -1,9 +1,9 @@
 import { ParamsDictionary } from 'express-serve-static-core';
-import { ParsedQs } from 'qs';
 
 import { TweetAudience, TweetType } from '@/constants/enums';
 
 import { Media } from '../Other';
+import { PaginationRequestQueries } from './Common.requests';
 
 export interface TweetRequestBody {
   type: TweetType;
@@ -21,11 +21,6 @@ export interface GetTweetRequestParams extends ParamsDictionary {
 
 export interface GetTweetChildrenRequestParams extends ParamsDictionary {
   tweet_id: string;
-}
-
-export interface PaginationRequestQueries extends ParsedQs {
-  limit: string;
-  page: string;
 }
 
 export interface GetTweetChildrenRequestQueries extends PaginationRequestQueries {

@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 
+import { PaginationRequestQueries } from '@/models/requests/Common.requests';
 import {
   GetTweetChildrenRequestParams,
   GetTweetChildrenRequestQueries,
   GetTweetRequestParams,
-  PaginationRequestQueries,
   TweetRequestBody,
 } from '@/models/requests/Tweet.requests';
 import { TokenPayload } from '@/models/requests/User.requests';
