@@ -102,6 +102,13 @@ class DatabaseService {
       this.followers.createIndex({ user_id: 1, followed_user_id: 1 });
     }
   }
+
+  async indexTweets() {
+    const exists = await this.tweets.indexExists(['content_text']);
+    if (!exists) {
+      this.tweets.createIndex({ content: 'text' }, { default_language: 'none' });
+    }
+  }
 }
 
 const databaseService = new DatabaseService();
