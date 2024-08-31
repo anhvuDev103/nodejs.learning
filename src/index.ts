@@ -44,5 +44,5 @@ app.use('/static/video', express.static(UPLOAD_VIDEO_DIR));
 app.use(defaultErrorHandler);
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`App listening on port ${port}`);
 });

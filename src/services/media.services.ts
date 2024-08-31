@@ -27,7 +27,6 @@ class Queue {
     this.items.push(item);
 
     const name = getNameFromFullName(item.split('\\').pop() as string);
-    console.log('>> Check | Queue | enqueue | name:', name);
     await databaseService.videoStatus.insertOne(
       new VideoStatus({
         name,

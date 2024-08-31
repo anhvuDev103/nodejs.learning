@@ -1,7 +1,6 @@
-import { ObjectId, WithId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 import { MediaType, MediaTypeQuery, TweetAudience, TweetType } from '@/constants/enums';
-import { SearchQueries } from '@/models/requests/Search.requests';
 import Tweet from '@/models/schemas/Tweet.schema';
 
 import databaseService from './database.services';
@@ -13,12 +12,14 @@ class SearchService {
     limit,
     page,
     media_type,
+    people_follow,
   }: {
     user_id: string;
     content: string;
     limit: number;
     page: number;
-    media_type: MediaTypeQuery;
+    media_type?: MediaTypeQuery;
+    people_follow?: string;
   }) {
     const $match: any = {
       $text: {
@@ -29,11 +30,38 @@ class SearchService {
     if (media_type) {
       if (media_type === MediaTypeQuery.Image) {
         $match['medias.type'] = MediaType.Image;
-      } else if (media_type === MediaTypeQuery.Video) {
+      }
+
+      if (media_type === MediaTypeQuery.Video) {
         $match['medias.type'] = {
           $in: [MediaType.Video, MediaType.Hls],
         };
       }
+    }
+
+    if (people_follow && people_follow === '1') {
+      const user_id_obj = new ObjectId(user_id);
+
+      const followed_user_ids = await databaseService.followers
+        .find(
+          {
+            user_id: user_id_obj,
+          },
+          {
+            projection: {
+              followed_user_id: 1,
+              _id: 0,
+            },
+          },
+        )
+        .toArray();
+
+      const ids = followed_user_ids.map((item) => item.followed_user_id);
+      ids.push(user_id_obj);
+
+      $match['user_id'] = {
+        $in: ids,
+      };
     }
 
     const [tweets, total] = await Promise.all([
@@ -293,7 +321,7 @@ class SearchService {
       tweet.user_views += 1;
     });
 
-    return { tweets, total: total[0].total };
+    return { tweets, total: total[0]?.total || 0 };
   }
 }
 

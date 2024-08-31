@@ -6,7 +6,7 @@ import { TokenPayload } from '@/models/requests/User.requests';
 import searchService from '@/services/search.services';
 
 export const searchController = async (req: Request<ParamsDictionary, any, any, SearchQueries>, res: Response) => {
-  const { content, limit, page, media_type } = req.query;
+  const { content, limit, page, media_type, people_follow } = req.query;
   const { user_id } = req.decoded_authorization as TokenPayload;
 
   const _limit = Number(limit);
@@ -18,6 +18,7 @@ export const searchController = async (req: Request<ParamsDictionary, any, any, 
     limit: _limit,
     page: _page,
     media_type,
+    people_follow,
   });
 
   return res.json({
