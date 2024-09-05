@@ -10,7 +10,7 @@ import Follower from '@/models/schemas/Follower.schema';
 import RefreshToken from '@/models/schemas/RefreshToken.schema';
 import User from '@/models/schemas/User.schema';
 import { hashPassword } from '@/utils/cryto';
-import { sendVerifyEmail } from '@/utils/email';
+import { sendForgotPasswordEmail, sendVerifyEmailRegister } from '@/utils/email';
 import { signToken, verifyToken } from '@/utils/jwt';
 
 import databaseService from './database.services';
@@ -246,14 +246,7 @@ class UserService {
       }),
     );
 
-    await sendVerifyEmail(
-      payload.email,
-      'Verify your email',
-      `
-        <h1>Verify your email</h1>
-        <p>Click <a href="${process.env.CLIENT_URL}/verify-email?token=${email_verify_token}">here</a> to verify your email</p>
-      `,
-    );
+    await sendVerifyEmailRegister(payload.email, email_verify_token);
 
     return {
       access_token,
@@ -349,51 +342,53 @@ class UserService {
     };
   }
 
-  async resendVerifyEmail(user_id: string) {
-    //Send email action
+  async resendVerifyEmail(user_id: string, email: string) {
     const email_verify_token = await this.signEmailVerifyToken({
       user_id: user_id.toString(),
       verify: UserVerifyStatus.Unverified,
     });
 
-    await databaseService.users.updateOne(
-      {
-        _id: new ObjectId(user_id),
-      },
-      {
-        $set: {
-          email_verify_token,
+    await Promise.all([
+      sendVerifyEmailRegister(email, email_verify_token),
+      databaseService.users.updateOne(
+        {
+          _id: new ObjectId(user_id),
         },
-        $currentDate: {
-          updated_at: true,
+        {
+          $set: {
+            email_verify_token,
+          },
+          $currentDate: {
+            updated_at: true,
+          },
         },
-      },
-    );
+      ),
+    ]);
 
     return {
       message: USERS_MESSAGES.RESEND_VERIFY_EMAIL_SUCCESS,
     };
   }
 
-  async forgotPassword({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+  async forgotPassword({ user_id, verify, email }: { user_id: string; verify: UserVerifyStatus; email: string }) {
     const forgot_password_token = await this.signForgotPasswordToken({ user_id, verify });
 
-    await databaseService.users.updateOne(
-      {
-        _id: new ObjectId(user_id),
-      },
-      {
-        $set: {
-          forgot_password_token,
+    await Promise.all([
+      databaseService.users.updateOne(
+        {
+          _id: new ObjectId(user_id),
         },
-        $currentDate: {
-          updated_at: true,
+        {
+          $set: {
+            forgot_password_token,
+          },
+          $currentDate: {
+            updated_at: true,
+          },
         },
-      },
-    );
-
-    //Send to email with link: https://twitter.com/forgot-password?token=token
-    console.log('Forgot password token: ', forgot_password_token);
+      ),
+      sendForgotPasswordEmail(email, forgot_password_token),
+    ]);
 
     return {
       message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD,
