@@ -10,6 +10,7 @@ import { EncodingStatus, MediaType } from '@/constants/enums';
 import { Media } from '@/models/Other';
 import VideoStatus from '@/models/schemas/VideoStatus.schema';
 import { getNameFromFullName, handleUploadImage, handleUploadVideo } from '@/utils/file';
+import { uploadFileToS3 } from '@/utils/s3';
 import { encodeHLSWithMultipleVideoStreams } from '@/utils/video';
 
 import databaseService from './database.services';
@@ -115,20 +116,27 @@ const queue = new Queue();
 class MediaService {
   async uploadImage(req: Request) {
     const files = await handleUploadImage(req);
+    const mime = (await import('mime')).default;
 
     const result: Media[] = await Promise.all(
       files.map(async (file) => {
         const newName = getNameFromFullName(file.newFilename);
-        const newPath = path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`);
+        const newFullFileName = `${newName}.jpg`;
+        const newPath = path.resolve(UPLOAD_IMAGE_DIR, newFullFileName);
 
         sharp.cache(false);
         await sharp(file.filepath).jpeg().toFile(newPath);
-        fs.unlinkSync(file.filepath);
+
+        const s3Result = await uploadFileToS3({
+          filename: newFullFileName,
+          filepath: newPath,
+          contentType: mime.getType(newFullFileName) as string,
+        });
+
+        await Promise.all([fsPromise.unlink(file.filepath), fsPromise.unlink(newPath)]);
 
         return {
-          url: isProduction
-            ? `${process.env.HOST}/static/image/${newName}`
-            : `http://localhost:${process.env.PORT}/static/image/${newName}`,
+          url: s3Result.Location as string,
           type: MediaType.Image,
         };
       }),
