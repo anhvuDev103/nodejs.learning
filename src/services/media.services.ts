@@ -120,6 +120,8 @@ class MediaService {
       files.map(async (file) => {
         const newName = getNameFromFullName(file.newFilename);
         const newPath = path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`);
+
+        sharp.cache(false);
         await sharp(file.filepath).jpeg().toFile(newPath);
         fs.unlinkSync(file.filepath);
 

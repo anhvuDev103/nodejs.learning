@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import './utils/s3';
 
 import cors from 'cors';
 import express from 'express';
