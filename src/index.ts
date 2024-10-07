@@ -2,6 +2,8 @@ import 'dotenv/config';
 
 import cors from 'cors';
 import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 import { UPLOAD_VIDEO_DIR } from './constants/dir';
 import { defaultErrorHandler } from './middlewares/error.middlewares';
@@ -24,6 +26,8 @@ databaseService.connect().then(() => {
 });
 
 const app = express();
+const httpServer = createServer(app);
+
 const port = process.env.PORT;
 
 //Create uploads folder
@@ -43,6 +47,21 @@ app.use('/static/video', express.static(UPLOAD_VIDEO_DIR));
 
 app.use(defaultErrorHandler);
 
-app.listen(port, () => {
+const io = new Server(httpServer, {
+  /* options */
+  cors: {
+    origin: 'http://localhost:3000',
+  },
+});
+
+io.on('connection', (socket) => {
+  console.log(`user ${socket.id} connected`);
+
+  socket.on('disconnect', () => {
+    console.log(`user ${socket.id} disconnected`);
+  });
+});
+
+httpServer.listen(port, () => {
   console.log(`App listening on port ${port}`);
 });
