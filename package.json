@@ -57,6 +57,11 @@
     "nanoid": "^5.0.7",
     "sharp": "^0.33.4",
     "slash": "^5.1.0",
+    "socket.io": "^4.8.0",
     "zx": "^8.1.4"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.8",
+    "utf-8-validate": "^6.0.4"
   }
 }
