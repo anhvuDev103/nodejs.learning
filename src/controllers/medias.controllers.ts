@@ -12,6 +12,7 @@ import {
   VideoStatusParams,
 } from '@/models/requests/Static.requests';
 import mediaService from '@/services/media.services';
+import { sendFileFromS3 } from '@/utils/s3';
 
 export const serveImageController = (req: Request<ServeImageParams>, res: Response) => {
   const { name } = req.params;
@@ -60,21 +61,13 @@ export const serveM3u8Controller = (req: Request<ServeM3u8Params>, res: Response
   const { id } = req.params;
   const [realId] = id.split('.');
 
-  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, realId, 'master.m3u8'), (err) => {
-    if (err) {
-      res.status((err as any).status).send('Not found');
-    }
-  });
+  sendFileFromS3(res, `videos-hls/${realId}/master.m3u8`);
 };
 
 export const serveSegmentController = (req: Request<ServeSegmentParams>, res: Response) => {
   const { id, v, segment } = req.params;
 
-  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, v, segment), (err) => {
-    if (err) {
-      res.status((err as any).status).send('Not found');
-    }
-  });
+  sendFileFromS3(res, `videos-hls/${id}/${v}/${segment}`);
 };
 
 export const uploadImageController = async (req: Request, res: Response) => {

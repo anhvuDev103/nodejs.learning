@@ -1,15 +1,15 @@
 import { Request } from 'express';
-import fs from 'fs';
 import fsPromise from 'fs/promises';
 import path from 'path';
+import { rimrafSync } from 'rimraf';
 import sharp from 'sharp';
 
 import { isProduction } from '@/constants/config';
-import { UPLOAD_IMAGE_DIR } from '@/constants/dir';
+import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '@/constants/dir';
 import { EncodingStatus, MediaType } from '@/constants/enums';
 import { Media } from '@/models/Other';
 import VideoStatus from '@/models/schemas/VideoStatus.schema';
-import { getNameFromFullName, handleUploadImage, handleUploadVideo } from '@/utils/file';
+import { getFiles, getNameFromFullName, handleUploadImage, handleUploadVideo } from '@/utils/file';
 import { uploadFileToS3 } from '@/utils/s3';
 import { encodeHLSWithMultipleVideoStreams } from '@/utils/video';
 
@@ -45,10 +45,10 @@ class Queue {
       this.encoding = true;
       const videoPath = this.items[0];
 
-      const name = getNameFromFullName(videoPath.split('/').pop() as string);
+      const idName = getNameFromFullName(videoPath.split('\\').pop() as string);
       await databaseService.videoStatus.updateOne(
         {
-          name,
+          name: idName,
         },
         {
           $set: {
@@ -61,14 +61,28 @@ class Queue {
       );
 
       try {
+        const mime = (await import('mime')).default;
+
         await encodeHLSWithMultipleVideoStreams(videoPath);
         this.items.shift();
-        await fsPromise.unlink(videoPath);
-        console.log(`Encode video ${videoPath} success`);
+
+        const files = getFiles(path.resolve(UPLOAD_VIDEO_DIR, idName));
+        await Promise.all(
+          files.map((filepath) => {
+            const filename = 'videos-hls/' + filepath.replace(path.resolve(UPLOAD_VIDEO_DIR), '').replace('\\', '');
+            return uploadFileToS3({
+              filepath,
+              filename,
+              contentType: mime.getType(filepath) as string,
+            });
+          }),
+        );
+
+        rimrafSync(path.resolve(UPLOAD_VIDEO_DIR, idName));
 
         await databaseService.videoStatus.updateOne(
           {
-            name,
+            name: idName,
           },
           {
             $set: {
@@ -79,11 +93,13 @@ class Queue {
             },
           },
         );
+
+        console.log(`Encode video ${videoPath} success`);
       } catch (error) {
         await databaseService.videoStatus
           .updateOne(
             {
-              name,
+              name: idName,
             },
             {
               $set: {
