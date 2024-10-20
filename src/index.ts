@@ -50,23 +50,41 @@ app.use(defaultErrorHandler);
 const io = new Server(httpServer, {
   /* options */
   cors: {
-    origin: 'http://localhost:3000',
+    origin: 'http://localhost:5173',
   },
 });
+
+const user: {
+  [key: string]: {
+    socket_id: string;
+  };
+} = {};
 
 io.on('connection', (socket) => {
   console.log(`user ${socket.id} connected`);
 
+  console.log(socket.handshake.auth);
+
+  const { user_id } = socket.handshake.auth;
+  user[user_id] = {
+    socket_id: socket.id,
+  };
+
+  socket.on('private message', (data) => {
+    console.log(data);
+
+    const { to: receiver_user_id, content } = data;
+
+    const receiver_socket_id = user[receiver_user_id].socket_id;
+    socket.to(receiver_socket_id).emit('receive private message', {
+      content,
+      from: user_id,
+    });
+  });
+
   socket.on('disconnect', () => {
+    delete user[user_id];
     console.log(`user ${socket.id} disconnected`);
-  });
-
-  socket.on('hello', (arg) => {
-    console.log('>> Check | arg:', arg);
-  });
-
-  socket.emit('hi', {
-    message: `Xin chao ${socket.id} da ket noi thanh cong`,
   });
 });
 
