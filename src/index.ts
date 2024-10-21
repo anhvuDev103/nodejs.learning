@@ -3,10 +3,12 @@ import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
 import { createServer } from 'http';
+import { ObjectId } from 'mongodb';
 import { Server } from 'socket.io';
 
 import { UPLOAD_VIDEO_DIR } from './constants/dir';
 import { defaultErrorHandler } from './middlewares/error.middlewares';
+import Conversation from './models/schemas/Conversation.schema';
 import bookmarksRouter from './routes/bookmarks.routes';
 import likesRouter from './routes/likes.routes';
 import mediasRouter from './routes/medias.routes';
@@ -70,14 +72,20 @@ io.on('connection', (socket) => {
     socket_id: socket.id,
   };
 
-  socket.on('private message', (data) => {
-    console.log(data);
-
-    const { to: receiver_user_id, content } = data;
+  socket.on('private message', async (data) => {
+    const { to: receiver_user_id, content, from } = data;
 
     const receiver_socket_id = user[receiver_user_id]?.socket_id;
 
     if (!receiver_socket_id) return;
+
+    await databaseService.conversations.insertOne(
+      new Conversation({
+        sender_id: new ObjectId(from),
+        receiver_id: new ObjectId(receiver_user_id),
+        content,
+      }),
+    );
 
     socket.to(receiver_socket_id).emit('receive private message', {
       content,
