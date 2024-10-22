@@ -10,6 +10,7 @@ import { UPLOAD_VIDEO_DIR } from './constants/dir';
 import { defaultErrorHandler } from './middlewares/error.middlewares';
 import Conversation from './models/schemas/Conversation.schema';
 import bookmarksRouter from './routes/bookmarks.routes';
+import conversationsRouter from './routes/conversations.routes';
 import likesRouter from './routes/likes.routes';
 import mediasRouter from './routes/medias.routes';
 import searchRouter from './routes/search.routes';
@@ -45,6 +46,7 @@ app.use('/tweets', tweetsRouter);
 app.use('/bookmarks', bookmarksRouter);
 app.use('/likes', likesRouter);
 app.use('/search', searchRouter);
+app.use('/conversations', conversationsRouter);
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR));
 
 app.use(defaultErrorHandler);
