@@ -7,7 +7,12 @@ import { ObjectId } from 'mongodb';
 import { Server } from 'socket.io';
 
 import { UPLOAD_VIDEO_DIR } from './constants/dir';
+import { UserVerifyStatus } from './constants/enums';
+import HTTP_STATUS from './constants/http-status';
+import { USERS_MESSAGES } from './constants/messages';
 import { defaultErrorHandler } from './middlewares/error.middlewares';
+import { ErrorWithStatus } from './models/Errors';
+import { TokenPayload } from './models/requests/User.requests';
 import Conversation from './models/schemas/Conversation.schema';
 import bookmarksRouter from './routes/bookmarks.routes';
 import conversationsRouter from './routes/conversations.routes';
@@ -18,6 +23,7 @@ import staticRouter from './routes/static.routes';
 import tweetsRouter from './routes/tweets.routes';
 import usersRouter from './routes/users.routes';
 import databaseService from './services/database.services';
+import { verifyAccessToken } from './utils/common';
 import { initFolder } from './utils/file';
 
 databaseService.connect().then(() => {
@@ -64,12 +70,36 @@ const user: {
   };
 } = {};
 
+io.use(async (socket, next) => {
+  const { Authorization } = socket.handshake.auth;
+
+  const [, access_token] = Authorization?.split(' ') || [];
+
+  try {
+    const decoded_authorization = await verifyAccessToken(access_token);
+    const { verify } = decoded_authorization as TokenPayload;
+    if (verify !== UserVerifyStatus.Verified) {
+      throw new ErrorWithStatus({
+        message: USERS_MESSAGES.USER_NOT_VERIFIED,
+        status: HTTP_STATUS.FORBIDDEN,
+      });
+    }
+
+    socket.handshake.auth.decoded_authorization = decoded_authorization as TokenPayload;
+    next();
+  } catch (error) {
+    next({
+      message: 'Unauthorized',
+      name: 'Unauthorized Error',
+      data: error,
+    });
+  }
+});
+
 io.on('connection', (socket) => {
   console.log(`user ${socket.id} connected`);
 
-  console.log(socket.handshake.auth);
-
-  const { user_id } = socket.handshake.auth;
+  const { user_id } = socket.handshake.auth.decoded_authorization as TokenPayload;
   user[user_id] = {
     socket_id: socket.id,
   };
@@ -78,8 +108,6 @@ io.on('connection', (socket) => {
     const { payload } = data;
 
     const receiver_socket_id = user[payload.receiver_id]?.socket_id;
-
-    if (!receiver_socket_id) return;
 
     const conversation = new Conversation({
       sender_id: new ObjectId(payload.sender_id),
@@ -91,9 +119,11 @@ io.on('connection', (socket) => {
 
     conversation._id = result.insertedId;
 
-    socket.to(receiver_socket_id).emit('receive_message', {
-      payload: conversation,
-    });
+    if (!receiver_socket_id) {
+      socket.to(receiver_socket_id).emit('receive_message', {
+        payload: conversation,
+      });
+    }
   });
 
   socket.on('disconnect', () => {
