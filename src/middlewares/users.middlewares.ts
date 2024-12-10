@@ -585,3 +585,12 @@ export const isUserLoggedInValidator = (middleware: RequestHandler) => {
     next();
   };
 };
+
+export const getConversationsValidator = validate(
+  checkSchema(
+    {
+      receiver_id: userIdSchema,
+    },
+    ['params'],
+  ),
+);

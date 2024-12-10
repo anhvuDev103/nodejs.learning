@@ -27,6 +27,7 @@ class ConversationsService {
     const [conversations, total] = await Promise.all([
       databaseService.conversations
         .find(match)
+        .sort({ created_at: -1 })
         .skip(limit * (page - 1))
         .limit(limit)
         .toArray(),
